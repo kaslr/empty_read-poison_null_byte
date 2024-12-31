@@ -59,7 +59,7 @@ The heap is a region of memory used for dynamic memory allocation. When a progra
 ### Heap Design in glibc
 In glibc, the heap is managed using a data structure called a "heap chunk." Each chunk contains metadata that describes its size and status (allocated or free). The heap is divided into different bins, which are lists of chunks of varying sizes. When a chunk is freed, it is added to the appropriate bin, making it available for future allocations.
 
-Key Components of a Chunk
+### Key Components of a Chunk
 **Size:** Indicates the total size of the chunk, including both the metadata and the user data.
 
 **In-use bit**: A flag indicating whether the chunk is currently allocated (in use) or free.
@@ -77,7 +77,7 @@ Bins are lists of free chunks of varying sizes. They help the allocator quickly 
 
 **Small and large bins**: Used for larger chunks and are sorted by size to optimize allocation.
 
-glibc Interfaces
+### glibc Interfaces
 glibc offers interfaces to interact with the heap, enabling allocation, deallocation, and a variety of other operations. For example:
 
 **malloc**: Allocates memory and returns a pointer to the beginning of the allocated memory block.
@@ -86,9 +86,9 @@ glibc offers interfaces to interact with the heap, enabling allocation, dealloca
 
 **realloc**: Resizes previously allocated memory.
 
-Sadly, I wonʼt be teaching about the heap today. Iʼll only delve into the parts that relate to the vulnerability. If you feel youʼre not catching up due to some things I donʼt explain, I recommend reading Azeriaʼs articles on glibc. She provides excellent in-depth explanations that can help fill in any gaps. Here’s the relevant link to her blog posts. [Azeria-Labs](https://azeria-labs.com). Or, if you're feeling adventurous, you can read the source code at [malloc.c](https://codebrowser.dev/glibc/glibc/malloc/malloc.c.html).
+Sadly, I wonʼt be teaching about the heap today. Iʼll only delve into the parts that relate to the vulnerability. If you feel youʼre not catching up due to some things I donʼt explain, I recommend reading Azeriaʼs articles on glibc. She provides excellent in-depth explanations that can help fill in any gaps. Here’s the relevant link to her blog posts. [Azeria-Labs](https://azeria-labs.com). Or, if youʼre feeling adventurous, you can read the source code at [malloc.c](https://codebrowser.dev/glibc/glibc/malloc/malloc.c.html).
 
-As I mentioned earlier, the heap manages contiguous blocks of memory in structures called chunks. These chunks store not only the user's data but also metadata about their state, size, the size of the adjacent chunk, and special flags.
+As I mentioned earlier, the heap manages contiguous blocks of memory in structures called chunks. These chunks store not only the userʼs data but also metadata about their state, size, the size of the adjacent chunk, and special flags.
 
 ## Somewhat Detailed Explanation of Chunks
 Chunks in the glibc heap contain metadata that helps manage memory allocation. This metadata is stored in the header of the chunk, preceding the user data. The key components of the chunk metadata include:
