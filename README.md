@@ -20,7 +20,7 @@ typedef struct user {
 
 The application maintains a list of users in a global array. This array is used to access user information. Users provide the index into this array at creation time, which is then used to access their information.
 
-Upon analyzing the functions, I observed that proper pointer arithmetic was employed. When a user was deleted, their position in the global array, which holds pointers to the user structures, was zeroed out. This ensured that we couldn't access deleted user pointers, thereby preventing access to freed memory and avoiding any use-after-free situations.
+Upon analyzing the functions, I observed that proper pointer arithmetic was employed. When a user was deleted, their position in the global array, which holds pointers to the user structures, was zeroed out. This ensured that we couldnʼt access deleted user pointers, thereby preventing access to freed memory and avoiding any use-after-free situations.
 
 After a deep analysis of the user creation function, I noticed that we couldnʼt create an email with a length greater than 512 bytes. Additionally, the maximum number of users in the user list was limited to 10, making the highest index 9. All user input emails were also terminated with a null byte at the end. This was the vulnerable part of the code. The bug was present in both the user creation and editing functions.
 
@@ -108,7 +108,7 @@ Here’s a simple pictorial representation of an allocated chunk in the heap:
 
 The area marked as "User Data" in the diagram is the portion of the chunk that the malloc function returns to the user for use.
 
-A free chunk also has metadata, such as pointers to the next and previous free chunks, and it stores this information in the region that was previously used for the application's data. This allows the allocator to efficiently manage and reuse free memory chunks.
+A free chunk also has metadata, such as pointers to the next and previous free chunks, and it stores this information in the region that was previously used for the applicationʼs data. This allows the allocator to efficiently manage and reuse free memory chunks.
 
 ![free_chunk](https://th.bing.com/th/id/R.2e3b09b9a4bab6c26c51871e82dd2a47?rik=HwNBPpIZ6KxqiQ&pid=ImgRaw&r=0)
 
@@ -124,7 +124,7 @@ Next, I created 7 rogue chunks to populate the 512-byte tcache bins. This ensure
 
 By carefully managing these allocations and frees, I was able to manipulate the heap layout to my advantage. This setup was crucial for the next steps in the exploitation process.
 
-I made 3 more allocations (created new users) all sitting next to each other. Let's label these chunks A, B, and C for easier reference. The idea was to consolidate all 3 of these chunks so that allocations made after the tcache was emptied would overlap a user data region. Since this region could be used to serve up a malloc allocation (the application still thinks that user exists, therefore its chunk is valid), we could overwrite the data pointer of a user struct to point to an arbitrary address, giving us a write-what-where primitive.
+I made 3 more allocations (created new users) all sitting next to each other. Letʼs label these chunks A, B, and C for easier reference. The idea was to consolidate all 3 of these chunks so that allocations made after the tcache was emptied would overlap a user data region. Since this region could be used to serve up a malloc allocation (the application still thinks that user exists, therefore its chunk is valid), we could overwrite the data pointer of a user struct to point to an arbitrary address, giving us a write-what-where primitive.
 
 Chunks A and B are each 512 bytes in size. Chunk C, on the other hand, is 528 bytes. The reason I made chunk C this size was to bypass a specific check in the heap allocator.
 
@@ -141,7 +141,7 @@ free_perturb(chunk2mem(p), size - CHUNK_HDR_SZ);
 
 The code snippet below checks if the chunk weʼre trying to free has already been freed by examining the prev_in_use bit of the next chunk. If that bit has been cleared, it indicates that weʼve freed this chunk before, resulting in a double free. The next check ensures that the size of the next chunk is not less than the size of a chunk header, which is 16 bytes on 32-bit systems. Therefore, the payload at the soon-to-be orphaned memory region, with the first 4 bytes being the prev_size field and the next 4 bytes being its size plus flags, has the value 0x11 in hexadecimal, which passes both checks.
 
-To trigger the overflow and cause consolidation, we start by freeing the 7 rogue chunks we created. This action populates the 512-byte bin for the tcache, ensuring that subsequent frees will go to the unsorted bin. Next, we free chunk A, adding it to the unsorted bin. We then trigger the overflow by writing the maximum number of bytes minus 4, leaving space for 4 bytes. What we place at this memory region is crucial for the consolidation process. As you know, this region holds the prev_size field of chunk C. We set its value to 1024 bytes. Why? Let's examine the code snippet.
+To trigger the overflow and cause consolidation, we start by freeing the 7 rogue chunks we created. This action populates the 512-byte bin for the tcache, ensuring that subsequent frees will go to the unsorted bin. Next, we free chunk A, adding it to the unsorted bin. We then trigger the overflow by writing the maximum number of bytes minus 4, leaving space for 4 bytes. What we place at this memory region is crucial for the consolidation process. As you know, this region holds the prev_size field of chunk C. We set its value to 1024 bytes. Why? Letʼs examine the code snippet.
 
 ```c
 /* Consolidate backward.  */
@@ -172,7 +172,7 @@ fd->bk = bk;
 bk->fd = fd;
 ```
 
-The code performs several safety checks. First, it verifies that the size of the chunk we want to unlink matches the `prev_size` field of the next chunk. This is the case for us because the next chunk that borders A is B, and after we freed A, the allocator updated B's `prev_size` field to the size of A.
+The code performs several safety checks. First, it verifies that the size of the chunk we want to unlink matches the `prev_size` field of the next chunk. This is the case for us because the next chunk that borders A is B, and after we freed A, the allocator updated Bʼs `prev_size` field to the size of A.
 
 The next check ensures there has been no linked list corruption by verifying that the `fd` pointer of the chunk before A in the bin is indeed pointing to A, and similarly, the `bk` pointer of the chunk after A is pointing to A. If all these checks pass, the chunks before and after A are repositioned to point to each other, effectively unlinking A from the bin.
 
@@ -256,4 +256,4 @@ With our last user, we follow the same procedure as our previous allocation. Thi
 
 Having calculated the libc base address, I overwrite the data pointer of the newly created user to point to __free_hook, overwriting whatever was there with system. Then, by editing the data of a chunk with the string /bin/sh\x00, deleting that user would trigger the __free_hook, which in turn calls system with the string /bin/sh passed to it, effectively popping a shell.
 
-And thatʼs it, folks! This is my first write-up, and it's almost certainly not perfect but I hope you enjoyed reading it as much as I enjoyed writing it. If you have any corrections or questions, feel free to reach out to me on X @ [kaslr](https://x.com/kaslr)
+And thatʼs it, folks! This is my first write-up, and itʼs almost certainly not perfect but I hope you enjoyed reading it as much as I enjoyed writing it. If you have any corrections or questions, feel free to reach out to me on X @ [kaslr](https://x.com/_kaslr)
