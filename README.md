@@ -1,6 +1,6 @@
 ## OFF-BY-ONE ERRORS: _THE POISON NULL BYTE_
 
-Until two days ago, I was confident in my ability to tackle any heap challenge. Having successfully completed every heap challenge on [Flagyard](https://flagyard.com), I believed it couldnʼt get any tougher. However, I was proven wrong when my friend, ___stdcall_, sent me a pwn with a vulnerability that led me down a rabbit hole of research.
+Until two days ago, I was confident in my ability to tackle any heap challenge. Having successfully completed every heap challenge on [Flagyard](https://flagyard.com), I believed it couldnʼt get any tougher. However, I was proven wrong when my friend, _0x1337_, sent me a pwn with a vulnerability that led me down a rabbit hole of research.
 
 In this detailed write-up, Iʼll explain how I abused a null byte overflow to achieve arbitrary code execution.
 
