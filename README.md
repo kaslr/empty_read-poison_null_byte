@@ -176,7 +176,7 @@ The code performs several safety checks. First, it verifies that the size of the
 
 The next check ensures there has been no linked list corruption by verifying that the `fd` pointer of the chunk before A in the bin is indeed pointing to A, and similarly, the `bk` pointer of the chunk after A is pointing to A. If all these checks pass, the chunks before and after A are repositioned to point to each other, effectively unlinking A from the bin.
 
-After we unlink chunk A, we can then merge these chunks together to create a larger free chunk. This process is handled by the `_int_create_free_chunk` function. The code isnʼt hard to follow, but Iʼll explain the relevant parts.
+After we unlink chunk A, we can then merge these chunks together to create a larger free chunk. This process is handled by the `_int_free_create_chunk` function. The code isnʼt hard to follow, but Iʼll explain the relevant parts.
 
 ```c
 static INTERNAL_SIZE_T
