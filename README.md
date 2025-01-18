@@ -157,6 +157,7 @@ if (!prev_inuse(p))
 ```
 
 First, we check if the previous chunk is free by examining the prev_in_use bit of the current chunk. If this bit is cleared, it indicates that the chunk is free, allowing us to consolidate backwards. Next, we read the prev_size field of the current chunk, which tells us how far back we can merge. By setting this value to 1024 (512 * 2) , we can go as far back as chunk A, enabling us to consolidate chunks A, B, and C.
+The next if statement checks if the size of the chunk weʼre  about to consolidate with is the same as the previous size field of the consolidating chunk, in our case this would crash the program since theyʼre both not the same but luckily for us, this piece of code was added later on in some new version of glibc & the binary uses an older version, libc-2.27.so, so we can ignore it, I only showed it here in case youʼre using a newer version of glibc & you get a crash with this error.
 
 Since weʼve freed chunk A and added it to the unsorted bin, we need to unlink it before consolidation. This step is necessary before we add the newly consolidated chunk back to the unsorted bin.
 
