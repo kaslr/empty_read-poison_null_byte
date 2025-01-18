@@ -112,7 +112,7 @@ A free chunk also has metadata, such as pointers to the next and previous free c
 
 ![free_chunk](https://th.bing.com/th/id/R.2e3b09b9a4bab6c26c51871e82dd2a47?rik=HwNBPpIZ6KxqiQ&pid=ImgRaw&r=0)
 
-Got it! Letʼs dive into the meat and potatoes of the vulnerability and how I managed to exploit it to get code execution.
+Letʼs dive into the meat and potatoes of the vulnerability and how I managed to exploit it to get code execution.
 
 My approach to exploiting the binary was straightforward: chunk consolidation. By merging chunks that were still in use, we could artificially trigger a use-after-free (UAF) condition, which could then be leveraged to create a powerful information leak primitive.
 
