@@ -114,7 +114,7 @@ A free chunk also has metadata, such as pointers to the next and previous free c
 
 Letʼs dive into the meat and potatoes of the vulnerability and how I managed to exploit it to get code execution.
 
-My approach to exploiting the binary was straightforward: chunk consolidation. By merging chunks that were still in use, we could artificially trigger a use-after-free (UAF) condition, which could then be leveraged to create a powerful information leak primitive.
+My approach to exploiting the binary was straightforward: chunk consolidation. By merging chunks that were still in use, we could artificially trigger a use-after-free (UAF) condition, which could then be leveraged to create a powerful arbitraty r/w primitive.
 
 Since the application used the tcache and the maximum length of user emails was 512 bytes, I knew I had to be a bit more creative with my allocations and frees. I started by making a few rogue allocations, all matching the size of the user structure (e.g., the user structure is 0x10 bytes on the heap). This was to populate the tcache so that subsequent allocations would use those for the user data structure, ensuring that only the email data would be set next to each other.
 
